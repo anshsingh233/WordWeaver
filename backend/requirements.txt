@@ -1,0 +1,23 @@
+# ── Web Framework ──────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+
+# ── Spell Check ────────────────────────────────────────
+autocorrect==2.6.1
+pyspellchecker==0.8.1
+
+# ── Grammar Check ──────────────────────────────────────
+language_tool_python==2.7.1
+
+# ── Formality Classifier ───────────────────────────────
+scikit-learn==1.6.1
+joblib==1.4.2
+numpy==1.26.4
+
+# ── Next-Word Predictor (built-in, no extra deps) ──────
+# predictor.py uses only Python stdlib: collections, re, functools
+
+# ── Utilities ──────────────────────────────────────────
+python-multipart==0.0.9
+httpx==0.27.2

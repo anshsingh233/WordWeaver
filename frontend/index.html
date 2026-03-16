@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Weaver — Research Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" 
+    href="styles.css"
+    />
+  </head>
+  <body>
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <div class="app-name"><span class="dot"></span>Word Weaver</div>
+      <input
+        class="doc-title-input"
+        id="docTitle"
+        type="text"
+        value="Untitled Research Paper"
+        spellcheck="false"
+      />
+      <div class="title-actions">
+        <button class="title-btn" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <button class="title-btn" onclick="openFindReplace()">
+          <i class="fas fa-search"></i> Find
+        </button>
+        <button class="title-btn primary" onclick="downloadPDF()">
+          <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Ribbon Tabs -->
+    <div class="ribbon-tabs">
+      <button class="tab-btn active" onclick="switchTab(this,'home')">
+        Home
+      </button>
+      <button class="tab-btn" onclick="switchTab(this,'insert')">Insert</button>
+      <button class="tab-btn" onclick="switchTab(this,'research')">
+        Research
+      </button>
+      <button class="tab-btn" onclick="switchTab(this,'layout')">Layout</button>
+      <button class="tab-btn" onclick="switchTab(this,'review')">Review</button>
+    </div>
+
+    <!-- Ribbon -->
+    <div class="ribbon" id="ribbon">
+      <!-- HOME -->
+      <div
+        id="tab-home"
+        class="tab-panel"
+        style="display: flex; align-items: center; gap: 2px; flex-wrap: wrap"
+      >
+        <div class="ribbon-group">
+          <select
+            class="rselect"
+            style="width: 130px"
+            onchange="exec('fontName',this.value)"
+          >
+            <option value="Crimson Pro">Crimson Pro</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Garamond">Garamond</option>
+            <option value="JetBrains Mono">Mono</option>
+            <option value="Outfit">Outfit</option>
+            <option value="Arial">Arial</option>
+          </select>
+          <select
+            class="rselect"
+            style="width: 58px"
+            onchange="exec('fontSize',this.value)"
+          >
+            <option value="1">8pt</option>
+            <option value="2">10pt</option>
+            <option value="3" selected>12pt</option>
+            <option value="4">14pt</option>
+            <option value="5">18pt</option>
+            <option value="6">24pt</option>
+            <option value="7">36pt</option>
+          </select>
+        </div>
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            id="bold-btn"
+            onclick="fmtToggle('bold','bold-btn')"
+            data-tip="Bold (Ctrl+B)"
+          >
+            <i class="fas fa-bold"></i>
+          </button>
+          <button
+            class="rbtn"
+            id="italic-btn"
+            onclick="fmtToggle('italic','italic-btn')"
+            data-tip="Italic (Ctrl+I)"
+          >
+            <i class="fas fa-italic"></i>
+          </button>
+          <button
+            class="rbtn"
+            id="underline-btn"
+            onclick="fmtToggle('underline','underline-btn')"
+            data-tip="Underline (Ctrl+U)"
+          >
+            <i class="fas fa-underline"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="fmtToggle('strikeThrough','strike-btn')"
+            data-tip="Strikethrough"
+          >
+            <i class="fas fa-strikethrough"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="exec('superscript')"
+            data-tip="Superscript"
+          >
+            <i class="fas fa-superscript"></i>
+          </button>
+          <button class="rbtn" onclick="exec('subscript')" data-tip="Subscript">
+            <i class="fas fa-subscript"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+  <div class="color-wrap" data-tip="Text Color">
+    <span style="font-size: 11px; color: var(--text-muted)">A</span>
+    <div class="color-swatch" id="foreColorSwatch">
+      <input
+        type="color"
+        value="#1a1a1a"
+        oninput="applyColor('foreColor', this.value)"
+      />
+    </div>
+  </div>
+  
+  <div class="color-wrap" data-tip="Highlight">
+    <i class="fas fa-highlighter" style="font-size: 11px; color: var(--text-muted)"></i>
+    <div class="color-swatch" id="hiliteColorSwatch">
+      <input
+        type="color"
+        value="#ffff00"
+        oninput="applyColor('hiliteColor', this.value)"
+      />
+    </div>
+  </div>
+</div>
+        
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="exec('justifyLeft')" data-tip="Left">
+            <i class="fas fa-align-left"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="exec('justifyCenter')"
+            data-tip="Center"
+          >
+            <i class="fas fa-align-center"></i>
+          </button>
+          <button class="rbtn" onclick="exec('justifyRight')" data-tip="Right">
+            <i class="fas fa-align-right"></i>
+          </button>
+          <button class="rbtn" onclick="exec('justifyFull')" data-tip="Justify">
+            <i class="fas fa-align-justify"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            onclick="exec('insertOrderedList')"
+            data-tip="Numbered List"
+          >
+            <i class="fas fa-list-ol"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="exec('insertUnorderedList')"
+            data-tip="Bullet List"
+          >
+            <i class="fas fa-list-ul"></i>
+          </button>
+          <button class="rbtn" onclick="exec('indent')" data-tip="Indent">
+            <i class="fas fa-indent"></i>
+          </button>
+          <button class="rbtn" onclick="exec('outdent')" data-tip="Outdent">
+            <i class="fas fa-outdent"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="exec('undo')" data-tip="Undo">
+            <i class="fas fa-undo"></i>
+          </button>
+          <button class="rbtn" onclick="exec('redo')" data-tip="Redo">
+            <i class="fas fa-redo"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="exec('removeFormat')"
+            data-tip="Clear Format"
+          >
+            <i class="fas fa-remove-format"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <select
+            class="rselect"
+            style="width: 100px"
+            onchange="applyHeading(this.value)"
+          >
+            <option value="">Heading…</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+            <option value="h4">Heading 4</option>
+            <option value="p">Paragraph</option>
+            <option value="blockquote">Blockquote</option>
+            <option value="pre">Code Block</option>
+          </select>
+        </div>
+        <div class="ribbon-group">
+          <select
+            class="rselect"
+            style="width: 90px"
+            onchange="setLineSpacing(this.value)"
+          >
+            <option value="">Spacing…</option>
+            <option value="1">Single</option>
+            <option value="1.5">1.5</option>
+            <option value="2" selected>Double</option>
+            <option value="3">Triple</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- INSERT -->
+      <div
+        id="tab-insert"
+        class="tab-panel"
+        style="display: none; align-items: center; gap: 2px; flex-wrap: wrap"
+      >
+        <div class="ribbon-group">
+          <button
+            class="rbtn accent-btn"
+            onclick="openImageModal()"
+            data-tip="Insert Image"
+          >
+            <i class="fas fa-image"></i><span class="rbtn-label">Image</span>
+          </button>
+          <button class="rbtn" onclick="insertTable()" data-tip="Table">
+            <i class="fas fa-table"></i><span class="rbtn-label">Table</span>
+          </button>
+          <button class="rbtn" onclick="insertHR()" data-tip="Horizontal Rule">
+            <i class="fas fa-minus"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="insertLink()" data-tip="Hyperlink">
+            <i class="fas fa-link"></i>
+          </button>
+          <button class="rbtn" onclick="exec('unlink')" data-tip="Remove Link">
+            <i class="fas fa-unlink"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button
+            class="rbtn gold-btn"
+            onclick="addPage()"
+            data-tip="New Page (Ctrl+M)"
+          >
+            <i class="fas fa-file-plus"></i
+            ><span class="rbtn-label">Add Page</span>
+          </button>
+          <button
+            class="rbtn"
+            onclick="insertPageBreak()"
+            data-tip="Page Break"
+          >
+            <i class="fas fa-cut"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="insertSpecialChar('—')">—</button>
+          <button class="rbtn" onclick="insertSpecialChar('…')">…</button>
+          <button class="rbtn" onclick="insertSpecialChar('©')">©</button>
+          <button class="rbtn" onclick="insertMathBlock()" data-tip="Math">
+            <i class="fas fa-square-root-alt"></i>
+          </button>
+          <button class="rbtn" onclick="insertCodeBlock()" data-tip="Code">
+            <i class="fas fa-code"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- RESEARCH -->
+      <div
+        id="tab-research"
+        class="tab-panel"
+        style="display: none; align-items: center; gap: 2px; flex-wrap: wrap"
+      >
+        <div class="ribbon-group">
+          <button class="rbtn accent-btn" onclick="insertAbstract()">
+            <i class="fas fa-file-alt"></i
+            ><span class="rbtn-label">Abstract</span>
+          </button>
+          <button class="rbtn accent-btn" onclick="insertTOC()">
+            <i class="fas fa-list"></i><span class="rbtn-label">TOC</span>
+          </button>
+          <button class="rbtn accent-btn" onclick="openCitationModal()">
+            <i class="fas fa-quote-right"></i
+            ><span class="rbtn-label">Citation</span>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="insertFootnote()">
+            <span class="rbtn-label">Footnote</span>
+          </button>
+          <button class="rbtn" onclick="openBibModal()">
+            <i class="fas fa-book"></i
+            ><span class="rbtn-label">Bibliography</span>
+          </button>
+          <button class="rbtn" onclick="insertFigure()">
+            <i class="fas fa-image"></i><span class="rbtn-label">Figure</span>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="insertKeywords()">
+            <i class="fas fa-tags"></i><span class="rbtn-label">Keywords</span>
+          </button>
+          <button class="rbtn" onclick="insertAffiliation()">
+            <i class="fas fa-user-edit"></i
+            ><span class="rbtn-label">Authors</span>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn gold-btn" onclick="openTemplateModal()">
+            <i class="fas fa-file-import"></i
+            ><span class="rbtn-label">Template</span>
+          </button>
+          <select
+            class="rselect"
+            style="width: 110px"
+            onchange="setCitationStyle(this.value)"
+          >
+            <option value="apa">APA</option>
+            <option value="mla">MLA</option>
+            <option value="chicago">Chicago</option>
+            <option value="ieee">IEEE</option>
+            <option value="harvard">Harvard</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- LAYOUT -->
+      <div
+        id="tab-layout"
+        class="tab-panel"
+        style="display: none; align-items: center; gap: 2px; flex-wrap: wrap"
+      >
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="setPageMargin('normal')">Normal</button>
+          <button class="rbtn" onclick="setPageMargin('narrow')">Narrow</button>
+          <button class="rbtn" onclick="setPageMargin('wide')">Wide</button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="setOrientation('portrait')">
+            <i class="fas fa-portrait"></i>
+          </button>
+          <button class="rbtn" onclick="setOrientation('landscape')">
+            <i class="fas fa-image" style="transform: rotate(90deg)"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="setColumns(1)">
+            <i class="fas fa-square"></i>
+          </button>
+          <button class="rbtn" onclick="setColumns(2)">
+            <i class="fas fa-columns"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <label
+            style="color: var(--text-muted); font-size: 11px; margin-right: 4px"
+            >Zoom</label
+          >
+          <input
+            type="range"
+            min="50"
+            max="150"
+            value="100"
+            style="width: 100px"
+            oninput="setZoom(this.value)"
+          />
+          <span
+            id="zoom-label"
+            style="color: var(--text-muted); font-size: 11px; width: 36px"
+            >100%</span
+          >
+        </div>
+      </div>
+
+      <!-- REVIEW — with all 4 AI buttons -->
+      <div
+        id="tab-review"
+        class="tab-panel"
+        style="display: none; align-items: center; gap: 2px; flex-wrap: wrap"
+      >
+        <div class="ribbon-group">
+          <button
+            class="rbtn accent-btn"
+            onclick="openFindReplace()"
+            data-tip="Find & Replace"
+          >
+            <i class="fas fa-search"></i
+            ><span class="rbtn-label">Find &amp; Replace</span>
+          </button>
+        </div>
+
+        <!-- ① Spell Check -->
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            id="btn-spell"
+            onclick="toggleSpellCheck()"
+            data-tip="Real-time Spell Check"
+          >
+            <i class="fas fa-spell-check"></i
+            ><span class="rbtn-label">Spell Check</span>
+          </button>
+        </div>
+
+        <!-- ② Grammar Check -->
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            id="btn-grammar"
+            onclick="toggleGrammarCheck()"
+            data-tip="Grammar Check (LanguageTool)"
+            style="
+              background: rgba(124, 77, 255, 0.1);
+              color: #a78bfa;
+              border: 1px solid rgba(124, 77, 255, 0.25);
+            "
+          >
+            <i class="fas fa-check-double"></i
+            ><span class="rbtn-label">Grammar</span>
+          </button>
+        </div>
+
+        <!-- ③ Formality Check -->
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            id="btn-formality"
+            onclick="toggleFormalityCheck()"
+            data-tip="Formal / Informal Tone"
+            style="
+              background: rgba(16, 185, 129, 0.1);
+              color: #6ee7b7;
+              border: 1px solid rgba(16, 185, 129, 0.25);
+            "
+          >
+            <i class="fas fa-balance-scale"></i
+            ><span class="rbtn-label">Formality</span>
+          </button>
+        </div>
+
+        <!-- ④ GPT-2 Suggestions -->
+        <div class="ribbon-group">
+          <button
+            class="rbtn"
+            id="btn-suggest"
+            onclick="toggleSuggest()"
+            data-tip="AI Word Suggestions (GPT-2)"
+            style="
+              background: rgba(249, 115, 22, 0.1);
+              color: #fdba74;
+              border: 1px solid rgba(249, 115, 22, 0.25);
+            "
+          >
+            <i class="fas fa-lightbulb"></i
+            ><span class="rbtn-label">Suggestions</span>
+          </button>
+        </div>
+
+        <div class="ribbon-group">
+          <button class="rbtn" onclick="countWords()" data-tip="Word Count">
+            <i class="fas fa-calculator"></i>
+          </button>
+          <button
+            class="rbtn"
+            onclick="showReadability()"
+            data-tip="Readability"
+          >
+            <i class="fas fa-chart-bar"></i>
+          </button>
+        </div>
+        <div class="ribbon-group">
+          <button class="rbtn gold-btn" onclick="exec('undo')">
+            <i class="fas fa-undo"></i>
+          </button>
+          <button class="rbtn gold-btn" onclick="exec('redo')">
+            <i class="fas fa-redo"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="editor-layout">
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Outline</span>
+          <button
+            class="title-btn"
+            style="padding: 2px 6px"
+            onclick="refreshTOC()"
+          >
+            <i class="fas fa-sync-alt" style="font-size: 10px"></i>
+          </button>
+        </div>
+        <div class="sidebar-body" id="tocList">
+          <div style="color: var(--text-muted); font-size: 11px; padding: 8px">
+            Start writing to see outline…
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-area" id="canvasArea">
+        <button class="add-page-btn" onclick="addPage()">
+          <i class="fas fa-plus"></i> Add New Page
+        </button>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-left">
+        <div class="status-item">
+          <span>Pages:</span><span class="val" id="st-pages">1</span>
+        </div>
+        <div class="status-item">
+          <span>Words:</span><span class="val" id="st-words">0</span>
+        </div>
+        <div class="status-item">
+          <span>Chars:</span><span class="val" id="st-chars">0</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <div class="status-item">
+          <span id="ai-status" style="color: var(--text-muted)">AI: Off</span>
+        </div>
+        <div class="status-item">
+          <span>Zoom:</span><span class="val" id="st-zoom">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GPT-2 Suggestion Bar -->
+    <div id="suggestion-bar">
+      <span class="sug-label">TAB</span>
+      <div id="sug-pills"></div>
+      <span class="tab-hint">→ accept first</span>
+    </div>
+
+    <!-- Spell Suggestions Popup -->
+    <div id="spell-popup"></div>
+
+    <!-- Grammar Panel -->
+    <div id="grammar-panel">
+      <div class="gp-header">
+        <span class="gp-title"
+          ><i
+            class="fas fa-check-double"
+            style="color: #a78bfa; margin-right: 6px"
+          ></i
+          >Grammar Issues</span
+        >
+        <button class="modal-close" onclick="toggleGrammarCheck()">✕</button>
+      </div>
+      <div class="gp-body" id="gp-body">
+        <div class="gp-empty">Click "Grammar" to analyse your document.</div>
+      </div>
+    </div>
+
+    <!-- Find & Replace -->
+    <div class="find-bar" id="findBar">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 4px;
+        "
+      >
+        <span
+          style="font-size: 11px; color: var(--text-muted); font-weight: 600"
+          >FIND & REPLACE</span
+        >
+        <button class="modal-close" onclick="closeFindReplace()">✕</button>
+      </div>
+      <div class="find-bar-row">
+        <input
+          class="find-input"
+          id="findInput"
+          placeholder="Find…"
+          oninput="doFind()"
+        />
+        <button class="find-btn" onclick="findNext()">Next</button>
+        <button class="find-btn" onclick="findPrev()">Prev</button>
+      </div>
+      <div class="find-bar-row">
+        <input
+          class="find-input"
+          id="replaceInput"
+          placeholder="Replace with…"
+        />
+        <button class="find-btn" onclick="doReplace()">Replace</button>
+        <button class="find-btn" onclick="doReplaceAll()">All</button>
+      </div>
+      <div
+        id="findStatus"
+        style="font-size: 10px; color: var(--text-muted)"
+      ></div>
+    </div>
+
+    <!-- Formality Modal -->
+    <div class="modal-overlay hidden" id="formalityModal">
+      <div class="modal" style="width: 420px">
+        <div class="modal-header">
+          <span class="modal-title"
+            ><i
+              class="fas fa-balance-scale"
+              style="color: #6ee7b7; margin-right: 8px"
+            ></i
+            >Formality Analysis</span
+          >
+          <button class="modal-close" onclick="closeModal('formalityModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body" id="formalityBody">
+          <div style="text-align: center; padding: 20px">
+            <div
+              class="spinner"
+              style="
+                margin: 0 auto;
+                width: 28px;
+                height: 28px;
+                border-width: 3px;
+              "
+            ></div>
+            <div
+              style="
+                margin-top: 12px;
+                color: var(--text-muted);
+                font-size: 13px;
+              "
+            >
+              Analysing tone…
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('formalityModal')">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Citation Modal -->
+    <div class="modal-overlay hidden" id="citationModal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title"
+            ><i
+              class="fas fa-quote-right"
+              style="color: var(--accent); margin-right: 8px"
+            ></i
+            >Insert Citation</span
+          ><button class="modal-close" onclick="closeModal('citationModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Source Type</label
+            ><select class="form-select" id="citeType">
+              <option value="journal">Journal Article</option>
+              <option value="book">Book</option>
+              <option value="website">Website</option>
+              <option value="conference">Conference Paper</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Author(s)</label
+            ><input
+              class="form-input"
+              id="citeAuthor"
+              placeholder="Last, F. M."
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year</label
+            ><input
+              class="form-input"
+              id="citeYear"
+              placeholder="2024"
+              style="width: 100px"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label
+            ><input
+              class="form-input"
+              id="citeTitle"
+              placeholder="Title of the work"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Journal / Publisher</label
+            ><input
+              class="form-input"
+              id="citeJournal"
+              placeholder="Journal Name"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Volume / Pages</label
+            ><input
+              class="form-input"
+              id="citeVolume"
+              placeholder="12(3), 45–67"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">DOI / URL</label
+            ><input
+              class="form-input"
+              id="citeDOI"
+              placeholder="https://doi.org/…"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('citationModal')">
+            Cancel</button
+          ><button class="modal-btn primary" onclick="insertCitation()">
+            Insert
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bibliography Modal -->
+    <div class="modal-overlay hidden" id="bibModal">
+      <div class="modal" style="width: 580px">
+        <div class="modal-header">
+          <span class="modal-title"
+            ><i
+              class="fas fa-book"
+              style="color: var(--accent); margin-right: 8px"
+            ></i
+            >References</span
+          ><button class="modal-close" onclick="closeModal('bibModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            id="bibList"
+            style="max-height: 240px; overflow-y: auto; margin-bottom: 14px"
+          ></div>
+          <button class="modal-btn primary" onclick="insertBibliography()">
+            Insert Bibliography
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('bibModal')">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="modal-overlay hidden" id="templateModal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title"
+            ><i
+              class="fas fa-file-import"
+              style="color: var(--accent-gold); margin-right: 8px"
+            ></i
+            >Paper Template</span
+          ><button class="modal-close" onclick="closeModal('templateModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select Template</label>
+            <select class="form-select" id="templateSelect">
+              <option value="ieee">IEEE Research Paper</option>
+              <option value="apa">APA Research Paper</option>
+              <option value="thesis">Thesis / Dissertation</option>
+              <option value="review">Literature Review</option>
+              <option value="case">Case Study</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('templateModal')">
+            Cancel</button
+          ><button class="modal-btn primary" onclick="loadTemplate()">
+            Load Template
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay hidden" id="imageModal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title"
+            ><i
+              class="fas fa-image"
+              style="color: var(--accent); margin-right: 8px"
+            ></i
+            >Insert Image</span
+          ><button class="modal-close" onclick="closeModal('imageModal')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            class="drop-zone"
+            id="dropZone"
+            onclick="document.getElementById('imgFileInput').click()"
+          >
+            <i class="fas fa-cloud-upload-alt"></i>Drop image or click to browse
+          </div>
+          <!-- <input
+            type="file"
+            id="imgFileInput"
+            accept="image/*"
+            style="display: none"
+            onchange="handleImageFile(this.files[0])"
+          /> -->
+          <input
+  type="file"
+  id="imgFileInput"
+  accept="image/*"
+  style="display: none"
+  onchange="handleImageFile(this.files[0])" 
+/>
+          <div class="form-group" style="margin-top: 14px">
+            <label class="form-label">Or paste URL</label
+            ><input
+              class="form-input"
+              id="imgUrlInput"
+              placeholder="https://…"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Caption</label
+            ><input
+              class="form-input"
+              id="imgCaption"
+              placeholder="Figure 1: …"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Width</label>
+            <select class="form-select" id="imgWidth">
+              <option value="100%">Full</option>
+              <option value="75%">75%</option>
+              <option value="50%">50%</option>
+              <option value="25%">25%</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('imageModal')">
+            Cancel</button
+          ><button class="modal-btn primary" onclick="insertImage()">
+            Insert
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Word Count Modal -->
+    <div class="modal-overlay hidden" id="wcModal">
+      <div class="modal" style="width: 340px">
+        <div class="modal-header">
+          <span class="modal-title">Document Statistics</span
+          ><button class="modal-close" onclick="closeModal('wcModal')">
+            ✕
+          </button>
+        </div>
+        <div
+          class="modal-body"
+          id="wcBody"
+          style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 2;
+            color: var(--text);
+          "
+        ></div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="closeModal('wcModal')">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+    <script src="script.js"></script>
+  </body>
+</html>
